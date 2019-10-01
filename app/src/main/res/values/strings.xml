@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">SMSForward</string>
     <string name="action_settings">Settings</string>
+    <string name="from">From: %1$s</string>
+    <string name="at">At: %1$s</string>
+    <string name="sent_to">Sent To: %1$s </string>
+    <string name="status">Status: %1$s </string>
+    <string name="message">Message: %1$s </string>
 </resources>

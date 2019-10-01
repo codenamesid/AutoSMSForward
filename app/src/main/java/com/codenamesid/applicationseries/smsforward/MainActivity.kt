@@ -2,7 +2,6 @@ package com.codenamesid.applicationseries.smsforward
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.PhoneNumberUtils
@@ -12,36 +11,36 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-
-import java.util.Locale
-
-import android.Manifest.permission.RECEIVE_SMS
-import android.Manifest.permission.SEND_SMS
+import kotlinx.android.synthetic.main.content_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private var receiver: SMSReceiver? = null
+    private lateinit var viewModel: SMSViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        if (ContextCompat.checkSelfPermission(this, RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, RECEIVE_SMS) && ActivityCompat.shouldShowRequestPermissionRationale(this, SEND_SMS)) {
-
-            } else {
-                ActivityCompat.requestPermissions(this, arrayOf(RECEIVE_SMS, SEND_SMS), 101)
-            }
+        viewModel = ViewModelProviders.of(this).get(SMSViewModel::class.java)
+        val adapter = SMSAdapter(this)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+        var data = SMSDB.getDatabase(applicationContext).getSMSDAO().getAllSMS()
+        subscribeUI(adapter)
+        if (!hasPermissions()) {
+            ActivityCompat.requestPermissions(this, permissions, 101)
         } else {
             startService()
         }
+
 
         val sharedPref = getSharedPreferences("store", Context.MODE_PRIVATE)
         val phoneNumber = sharedPref.getString("PHONE_NUMBER", null)
@@ -55,10 +54,16 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver,filter);*/
     }
 
+    private fun subscribeUI(adapter: SMSAdapter) {
+        viewModel.getSMSLiveData().observe(this, Observer { messages ->
+            if (messages != null) adapter.submitList(messages)
+        })
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 101) {
-            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startService()
             }
         }
@@ -112,4 +117,17 @@ class MainActivity : AppCompatActivity() {
             receiver = null
         }
     }
+
+    private val permissions = arrayOf(android.Manifest.permission.RECEIVE_SMS, android.Manifest.permission.READ_SMS, android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_CALENDAR)
+    private fun hasPermissions(): Boolean {
+        for (perm in permissions) {
+            if (ActivityCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+
 }
