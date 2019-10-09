@@ -33,10 +33,16 @@ class SMSService : Service() {
     }
 
     private fun getAndroidChannelNotification(title: String, body: String): NotificationCompat.Builder {
+        val notificationIntent = Intent(applicationContext,MainActivity::class.java)
+        notificationIntent.flags=Intent.FLAG_ACTIVITY_CLEAR_TOP
+        notificationIntent.flags=Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         return NotificationCompat.Builder(applicationContext, NotificationUtils.SERVICE_STATUS_CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setOngoing(true)
+                .setContentIntent(pendingIntent)
                 .setSmallIcon(android.R.drawable.stat_notify_more)
                 .setAutoCancel(false)
     }
