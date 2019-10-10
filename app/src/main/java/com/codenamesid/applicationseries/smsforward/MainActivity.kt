@@ -4,13 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.telephony.PhoneNumberUtils
 import android.util.Log
-import android.util.Patterns
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -19,9 +16,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
+    private var dialogFragment: SettingsFragment?=null
     private var receiver: SMSReceiver? = null
     private lateinit var viewModel: SMSViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         val adapter = SMSAdapter(this)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-        var data = SMSDB.getDatabase(applicationContext).getSMSDAO().getAllSMS()
+        //var data = SMSDB.getDatabase(applicationContext).getSMSDAO().getAllSMS()
         subscribeUI(adapter)
         if (!hasPermissions()) {
             ActivityCompat.requestPermissions(this, permissions, 101)
@@ -41,17 +39,6 @@ class MainActivity : AppCompatActivity() {
             startService()
         }
 
-
-        val sharedPref = getSharedPreferences("store", Context.MODE_PRIVATE)
-        val phoneNumber = sharedPref.getString("PHONE_NUMBER", null)
-
-        if (phoneNumber != null) {
-            (findViewById<View>(R.id.editText) as EditText).setText(phoneNumber)
-        }
-        /*receiver=new SMSReceiver();
-        IntentFilter filter=new IntentFilter();
-        filter.setPriority(Integer.MAX_VALUE);
-        registerReceiver(receiver,filter);*/
     }
 
     private fun subscribeUI(adapter: SMSAdapter) {
@@ -69,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun startService() {
+    private fun startService() {
         val service = Intent(applicationContext, SMSService::class.java)
         startService(service)
     }
@@ -88,25 +75,40 @@ class MainActivity : AppCompatActivity() {
 
 
         return if (id == R.id.action_settings) {
+            invokeSettingsScreen()
             true
         } else super.onOptionsItemSelected(item)
 
     }
 
-    fun setForwardNumber(view: View) {
-
-        var phoneNumber = (findViewById<View>(R.id.editText) as EditText).text.toString()
-
-        if (Patterns.PHONE.matcher(phoneNumber).matches()) {
-            val sharedPref = this.getSharedPreferences("store", Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            phoneNumber = PhoneNumberUtils.formatNumber(phoneNumber, Locale.US.country)
-            (findViewById<View>(R.id.editText) as EditText).setText(phoneNumber)
-            editor.putString("PHONE_NUMBER", phoneNumber)
-            editor.apply()
-            val sb = Snackbar.make(findViewById(R.id.coordinatorLayout), "Forwarding Phone number set to $phoneNumber", 2000)
-            sb.show()
+    private fun invokeSettingsScreen() {
+        val ft = supportFragmentManager.beginTransaction()
+        val prev = supportFragmentManager.findFragmentByTag("dialog")
+        if (prev != null) {
+            ft.remove(prev)
         }
+        ft.addToBackStack(null)
+        dialogFragment = SettingsFragment()
+        dialogFragment!!.show(ft, "dialog")
+    }
+    @Suppress("UNUSED_PARAMETER")
+    @Override
+    fun setForwardNumber(view: View) {
+        if(dialogFragment !=null) {
+            if(dialogFragment!!.setForwardNumber()){
+                val sharedPref = getSharedPreferences("store", Context.MODE_PRIVATE)
+                val phoneNumber = sharedPref.getString("PHONE_NUMBER", null)
+                showSnackBar(findViewById(R.id.coordinatorLayout),"Forwarding Phone number set to $phoneNumber")
+                dialogFragment!!.dismiss()
+            }else{
+                showSnackBar(findViewById(R.id.coordinatorLayout),"Number is not a valid phone number")
+            }
+
+        }
+    }
+    private fun showSnackBar(parent: View, text: String) {
+        val sb = Snackbar.make(parent, text, Snackbar.LENGTH_LONG)
+        sb.show()
     }
 
     override fun onDestroy() {

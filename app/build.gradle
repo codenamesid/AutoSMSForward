@@ -11,7 +11,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "com.codenamesid.applicationseries.smsforward"
+        applicationId "com.codenamesid.applicationseries.smsforward.demo"
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
@@ -37,7 +37,7 @@ dependencies {
     api "androidx.core:core-ktx:1.1.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    def room_version = "2.1.0"
+    def room_version = "2.2.0"
 
     implementation "androidx.room:room-runtime:$room_version"
     //annotationProcessor "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
