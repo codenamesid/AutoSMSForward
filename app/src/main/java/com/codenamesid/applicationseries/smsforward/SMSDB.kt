@@ -12,15 +12,15 @@ abstract class SMSDB: RoomDatabase() {
 
     companion object{
         @Volatile
-        private var instance:SMSDB?=null;
+        private var instance:SMSDB?=null
 
         fun getDatabase(context: Context):SMSDB{
-            val temp= instance;
+            val temp= instance
             if(temp !=null){
-                return temp;
+                return temp
             }else{
                 synchronized(this) {
-                    val temp1 = Room.databaseBuilder(context.applicationContext, SMSDB::class.java, "sms_db").build();
+                    val temp1 = Room.databaseBuilder(context.applicationContext, SMSDB::class.java, "sms_db").build()
                     instance = temp1
                     return temp1
                 }

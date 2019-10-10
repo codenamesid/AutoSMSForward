@@ -10,8 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@id/time"
-        android:gravity="left"
+        android:layout_toStartOf="@id/time"
+        android:gravity="start"
         android:text="@string/from" />
 
     <TextView
@@ -21,7 +21,7 @@
         android:layout_below="@+id/from"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@id/status"
-        android:gravity="left"
+        android:gravity="start"
         android:text="@string/sent_to" />
 
     <TextView
@@ -48,7 +48,7 @@
         android:layout_below="@id/status"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        android:gravity="left"
+        android:gravity="start"
         android:textStyle="bold"
         tools:text="TextView" />
 

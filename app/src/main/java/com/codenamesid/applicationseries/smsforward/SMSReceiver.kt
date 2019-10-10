@@ -14,8 +14,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class SMSReceiver : BroadcastReceiver() {
-    internal var phoneNumber: String? = null
-    var compositeDisposable = CompositeDisposable()
+    private var phoneNumber: String? = null
+    private var compositeDisposable = CompositeDisposable()
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             Log.i("SMSReceiver", "received..")

@@ -1,20 +1,17 @@
 package com.codenamesid.applicationseries.smsforward
 
-import android.os.Parcelable
 import android.telephony.SmsMessage
 import androidx.room.*
-import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 
 @Entity(tableName = "tbl_sms")
-@Parcelize
 data class SMS(
         @ColumnInfo(name = "message") val message: String,
         @ColumnInfo(name = "from") val from: String,
         @ColumnInfo(name = "to") val to: String,
         @ColumnInfo (name="relayed") var relayed:Boolean
-) : Parcelable {
+) {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name =  "id")
     var uid: Int = 0
@@ -25,7 +22,7 @@ data class SMS(
     constructor(sms: SmsMessage, to: String, relayed: Boolean) : this(sms.displayMessageBody, sms.originatingAddress!!, to,relayed)
 
     override fun toString(): String {
-        return "From: $from : $message to: $to at: $date Relayed: $relayed";
+        return "From: $from : $message to: $to at: $date Relayed: $relayed"
     }
 }
 
