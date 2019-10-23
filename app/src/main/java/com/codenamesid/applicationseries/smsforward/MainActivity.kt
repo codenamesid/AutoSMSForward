@@ -99,6 +99,11 @@ class MainActivity : AppCompatActivity() {
                 val sharedPref = getSharedPreferences("store", Context.MODE_PRIVATE)
                 val phoneNumber = sharedPref.getString("PHONE_NUMBER", null)
                 showSnackBar(findViewById(R.id.coordinatorLayout),"Forwarding Phone number set to $phoneNumber")
+                if(dialogFragment!!.setFilterString()){
+                    showSnackBar(findViewById(R.id.coordinatorLayout),"Forward Filter set")
+                }else{
+                    showSnackBar(findViewById(R.id.coordinatorLayout),"Forward Filter set empty or not valid")
+                }
                 dialogFragment!!.dismiss()
             }else{
                 showSnackBar(findViewById(R.id.coordinatorLayout),"Number is not a valid phone number")

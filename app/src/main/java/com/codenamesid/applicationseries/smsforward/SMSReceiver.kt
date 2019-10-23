@@ -15,12 +15,14 @@ import io.reactivex.schedulers.Schedulers
 
 class SMSReceiver : BroadcastReceiver() {
     private var phoneNumber: String? = null
+    private var filter: String? = null
     private var compositeDisposable = CompositeDisposable()
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             Log.i("SMSReceiver", "received..")
             val sharedPref = context.getSharedPreferences("store", Context.MODE_PRIVATE)
             phoneNumber = sharedPref.getString("PHONE_NUMBER", null)
+            filter = sharedPref.getString("FILTER_STR", "Apple ID")
             if (phoneNumber != null) {
                 val smsMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
                 for (message in smsMessages) {
@@ -28,7 +30,7 @@ class SMSReceiver : BroadcastReceiver() {
                     val sms = SMS(message, phoneNumber!!, false)
 
                     //Log.i("SMSReceiver", "received message $smsText")
-                    if (smsText.contains("Apple ID")) {
+                    if (filter.isNullOrBlank() || smsText.contains(filter!!)) {
                         sendSMS(context, phoneNumber!!, message.displayMessageBody)
                         sms.relayed = true
                     }

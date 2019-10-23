@@ -6,7 +6,8 @@
     <string name="sent_to">Sent To: %1$s </string>
     <string name="status">Status: %1$s </string>
     <string name="message">Message: %1$s </string>
-    <string name="set_forwarding_number">Set Forwarding Number</string>
+    <string name="set_forwarding_number">Save Changes</string>
     <string name="phone_hint">555–555–5555</string>
     <string name="message_log">Message Log</string>
+    <string name="filter_text">Filter Text</string>
 </resources>
